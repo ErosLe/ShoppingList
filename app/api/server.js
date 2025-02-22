@@ -2,7 +2,7 @@ const express = require("express")
 const mongoose = require("mongoose")
 const cors = require("cors")
 require("dotenv").config()
-const { createServer } = require("@vercel/node") // Vercel Serverless támogatás
+const { createServer } = require("@vercel/node")
 
 const app = express()
 
@@ -61,5 +61,4 @@ app.delete("/api/items/:id", async (req, res) => {
   }
 })
 
-// **📌 Serverless exportálás (Vercel-hez szükséges)**
 module.exports = createServer(app)
