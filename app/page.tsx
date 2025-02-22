@@ -16,7 +16,8 @@ interface ShoppingItem {
   amount: number | null
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://your-vercel-app.vercel.app/api"
+// In your frontend code (e.g., app/page.tsx)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export default function ShoppingList() {
   const [items, setItems] = useState<ShoppingItem[]>([])
