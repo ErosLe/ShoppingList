@@ -16,8 +16,7 @@ interface ShoppingItem {
   amount: number | null
 }
 
-// In your frontend code (e.g., app/page.tsx)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 
 export default function ShoppingList() {
   const [items, setItems] = useState<ShoppingItem[]>([])
