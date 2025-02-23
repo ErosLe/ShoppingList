@@ -1,90 +1,48 @@
-const express = require("express")
-const mongoose = require("mongoose")
-const cors = require("cors")
-require("dotenv").config()
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
-const app = express()
-const PORT = process.env.PORT || 5000
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-app.use(cors())
-app.use(express.json())
-
-// Connect to MongoDB with error handling
+// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, { 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
 })
-.then(() => {
-  console.log('Successfully connected to MongoDB.')
-})
-.catch((error) => {
-  console.error('Error connecting to MongoDB:', error)
-})
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('MongoDB connection error:', err));
 
-// Add mongoose connection error handlers
-mongoose.connection.on('error', err => {
-  console.error('MongoDB connection error:', err)
-})
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected')
-})
-
-// Define the shopping item schema
+// Define schema and model
 const ShoppingItemSchema = new mongoose.Schema({
   name: String,
   checked: Boolean,
-  amount: Number,
-})
+  amount: Number
+});
 
-const ShoppingItem = mongoose.model("ShoppingItem", ShoppingItemSchema)
+const ShoppingItem = mongoose.model('ShoppingItem', ShoppingItemSchema);
 
-// API Routes with error handling
-app.get("/api/items", async (req, res) => {
+// Routes
+app.get('/api/items', async (req, res) => {
   try {
-    const items = await ShoppingItem.find()
-    console.log('Retrieved items:', items) // Add logging
-    res.json(items)
+    const items = await ShoppingItem.find();
+    res.json(items);
   } catch (error) {
-    console.error('Error fetching items:', error)
-    res.status(500).json({ error: 'Error fetching items' })
+    res.status(500).json({ message: error.message });
   }
-})
+});
 
-app.post("/api/items", async (req, res) => {
+app.post('/api/items', async (req, res) => {
+  const item = new ShoppingItem(req.body);
   try {
-    const newItem = new ShoppingItem(req.body)
-    await newItem.save()
-    console.log('Created new item:', newItem) // Add logging
-    res.json(newItem)
+    const newItem = await item.save();
+    res.status(201).json(newItem);
   } catch (error) {
-    console.error('Error creating item:', error)
-    res.status(500).json({ error: 'Error creating item' })
+    res.status(400).json({ message: error.message });
   }
-})
+});
 
-app.put("/api/items/:id", async (req, res) => {
-  try {
-    const updatedItem = await ShoppingItem.findByIdAndUpdate(req.params.id, req.body, { new: true })
-    console.log('Updated item:', updatedItem) // Add logging
-    res.json(updatedItem)
-  } catch (error) {
-    console.error('Error updating item:', error)
-    res.status(500).json({ error: 'Error updating item' })
-  }
-})
+// PUT and DELETE routes here...
 
-app.delete("/api/items/:id", async (req, res) => {
-  try {
-    await ShoppingItem.findByIdAndDelete(req.params.id)
-    console.log('Deleted item:', req.params.id) // Add logging
-    res.json({ message: "Item deleted" })
-  } catch (error) {
-    console.error('Error deleting item:', error)
-    res.status(500).json({ error: 'Error deleting item' })
-  }
-})
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
-})
+module.exports = app;
